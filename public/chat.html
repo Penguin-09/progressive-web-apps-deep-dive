@@ -8,7 +8,7 @@
             name="description"
             content="Yapchat is a mobile app with which users can converse with eachother in one large chatroom without needing to log in or fill in their phone number."
         />
-        <title>Yapchat - Start</title>
+        <title>Yapchat - Chat</title>
 
         <!-- PWA Meta -->
         <link rel="manifest" href="manifest.json" />
@@ -18,21 +18,19 @@
 
         <!-- JS -->
         <script type="module" src="js/script.js"></script>
-        <script src="js/start.js" defer></script>
+        <script src="js/chat.js" defer></script>
 
         <!-- CSS -->
         <link rel="stylesheet" href="css/style.css" />
     </head>
     <body>
-        <h1>Start page</h1>
+        <h2>Chat page</h2>
 
-        <form id="form">
-            <!-- Display name -->
-            <label for="displayName">Display name</label>
-            <input type="text" id="displayName" placeholder="John" required />
+        <p id="chatLog"></p>
 
-            <!-- Submit -->
-            <input type="submit" id="submit" value="Go!" />
+        <form action="">
+            <input type="text" id="userMessage" required />
+            <button type="submit" id="sendMessage">Send</button>
         </form>
     </body>
 </html>
