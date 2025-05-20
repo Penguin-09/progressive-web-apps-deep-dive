@@ -1,6 +1,8 @@
-# 💬 Yip Yap
+# 💬 Yapchat
 
-Yip Yap is a mobile app with which users can converse with eachother in one large chatroom without needing to log in or fill in their phone number. Yip Yap was developed with Progressive Web App Design, during a one week Deep Dive at Bit Academy.
+Yapchat is a mobile app with which users can converse with eachother in one large chatroom without needing to log in or fill in their phone number. Yapchat was developed with Progressive Web App Design, during a one week Deep Dive at Bit Academy.
+
+This project was documented using [Linear](https://linear.app/bitsquad01/team/BIT/active).
 
 ## 🧑‍💻 Authors
 
