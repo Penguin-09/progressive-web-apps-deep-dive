@@ -1,5 +1,19 @@
 console.debug("Main Script is executing");
 
+let deferredPrompt;
+
+// Listen for the beforeinstallprompt event
+window.addEventListener("beforeinstallprompt", (event) => {
+    console.debug("Install prompt ready to be triggered");
+
+    deferredPrompt = event;
+
+    // Trigger prompt a second time
+    setTimeout(() => {
+        deferredPrompt.prompt();
+    }, 2000);
+});
+
 // Register service worker
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {

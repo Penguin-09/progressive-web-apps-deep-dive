@@ -23,7 +23,7 @@ function printMessages(triggerHaptics = true) {
 
                     // Trigger haptic feedback
                     if (triggerHaptics && hasVibrationSupport()) {
-                        navigator.vibrate(100);
+                        navigator.vibrate(300);
                     } else {
                         console.debug("Vibration not supported");
                     }

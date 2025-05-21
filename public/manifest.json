@@ -4,6 +4,7 @@
     "description": "Yapchat is a mobile app with which users can converse with eachother in one large chatroom without needing to log in or fill in their phone number.",
     "start_url": "/",
     "display": "standalone",
+    "prefer_related_application": false,
     "background_color": "#f6f2ea",
     "theme_color": "#9d5df0",
     "icons": [
