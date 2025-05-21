@@ -23,11 +23,12 @@
 
   <!-- JS -->
   <script type="module" src="js/script.js"></script>
+  <script src="js/load.js" defer></script>
   <script src="js/start.js" defer></script>
 
 </head>
 
-<body class="bg-gradient-to-br from-purple-300 via-pink-200 to-yellow-100 min-h-screen flex items-center justify-center px-4 font-sans">
+<body class="min-h-screen flex items-center justify-center px-4 font-sans">
 <!-- Windows 98 Loading Screen -->
 <div id="loading-screen" class="fixed inset-0 bg-[#c3c7cb] z-50 flex items-center justify-center">
   <div class="w-80 max-w-sm border border-black shadow-[4px_4px_0_rgba(0,0,0,1)] bg-[#f0f0f0]">
@@ -77,14 +78,5 @@
     </form>
   </div>
 </div>
-<script>
-  window.addEventListener("load", () => {
-    const loadingScreen = document.getElementById("loading-screen");
-    setTimeout(() => {
-      loadingScreen.classList.add("opacity-0");
-      setTimeout(() => loadingScreen.remove(), 500);
-    }, 2600);
-  });
-</script>
 </body>
 </html>
