@@ -1,5 +1,8 @@
 console.debug("Chat script is executing");
 
+const sendButton = document.getElementById("sendMessage");
+const printedMessagesIDs = [];
+
 /**
  * Print all messages in the chat log
  */
@@ -9,16 +12,16 @@ function printMessages() {
         .then((messages) => {
             console.debug("Messages fetched");
 
-            const chatBoxElement = document.getElementById("chatLog");
-
-            // Clear existing messages
-            chatBoxElement.innerHTML = "";
-
             // Print message history
             for (const message of messages) {
-                const messageElement = document.createElement("div");
-                messageElement.innerHTML = `<p>${message.userName}</p><p>${message.content}</p>`;
-                chatBoxElement.appendChild(messageElement);
+                console.log(message._id);
+                if (!printedMessagesIDs.includes(message._id)) {
+                    printedMessagesIDs.push(message._id);
+
+                    const messageElement = document.createElement("div");
+                    messageElement.innerHTML = `<p>${message.userName}</p><p>${message.content}</p>`;
+                    chatBoxElement.appendChild(messageElement);
+                }
             }
         })
         .catch((error) => {
@@ -48,7 +51,21 @@ async function sendMessage(message = "Error, user message not found") {
     printMessages();
 }
 
-const sendButton = document.getElementById("sendMessage");
+/**
+ * Reload messages every 3 seconds
+ */
+async function refreshChat() {
+    while (true) {
+        printMessages();
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+    }
+}
+
+const chatBoxElement = document.getElementById("chatLog");
+
+// Clear existing messages
+chatBoxElement.innerHTML = "";
+
 sendButton.addEventListener("click", (event) => {
     event.preventDefault();
     const messageInput = document.getElementById("userMessage");
@@ -56,4 +73,4 @@ sendButton.addEventListener("click", (event) => {
     messageInput.value = "";
 });
 
-printMessages();
+refreshChat();
