@@ -23,6 +23,7 @@
 
   <!-- JS -->
   <script type="module" src="js/script.js"></script>
+  <script src="js/load.js" defer></script>
   <script src="js/start.js" defer></script>
 
 </head>
@@ -77,14 +78,5 @@
     </form>
   </div>
 </div>
-<script>
-  window.addEventListener("load", () => {
-    const loadingScreen = document.getElementById("loading-screen");
-    setTimeout(() => {
-      loadingScreen.classList.add("opacity-0");
-      setTimeout(() => loadingScreen.remove(), 500);
-    }, 2600);
-  });
-</script>
 </body>
 </html>
