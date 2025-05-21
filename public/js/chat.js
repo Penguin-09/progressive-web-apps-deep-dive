@@ -19,7 +19,7 @@ function printMessages() {
                     printedMessagesIDs.push(message._id);
 
                     const messageElement = document.createElement("div");
-                    messageElement.innerHTML = `<p>${message.userName}</p><p>${message.content}</p>`;
+                    messageElement.innerHTML = `<p><strong>${message.userName}</strong></p><p>${message.timestamp}</p><p>${message.content}</p>`;
                     chatBoxElement.appendChild(messageElement);
                 }
             }
@@ -35,6 +35,8 @@ function printMessages() {
  */
 async function sendMessage(message = "Error, user message not found") {
     let parameters = new URLSearchParams(document.location.search);
+    let timestamp = new Date();
+    timestamp = `${timestamp.getHours()}:${timestamp.getMinutes()}`;
 
     await fetch("/api/messages", {
         method: "POST",
@@ -44,6 +46,7 @@ async function sendMessage(message = "Error, user message not found") {
         body: JSON.stringify({
             content: message,
             userName: parameters.get("displayName") || "Anonymous",
+            timestamp: timestamp,
         }),
     });
     console.debug("Message sent");
