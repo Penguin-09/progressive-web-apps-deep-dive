@@ -14,7 +14,6 @@ function printMessages(triggerHaptics = true) {
 
             // Print message history
             for (const message of messages) {
-                console.log(message._id);
                 if (!printedMessagesIDs.includes(message._id)) {
                     printedMessagesIDs.push(message._id);
 
