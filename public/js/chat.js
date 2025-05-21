@@ -12,14 +12,28 @@ function printMessages(triggerHaptics = true) {
         .then((messages) => {
             console.debug("Messages fetched");
 
+            // Clear chat log before printing
+            chatBoxElement.innerHTML = "";
+            printedMessagesIDs.length = 0; // Reset printed IDs
+
             // Print message history
+            let lastUserName = null;
             for (const message of messages) {
                 if (!printedMessagesIDs.includes(message._id)) {
                     printedMessagesIDs.push(message._id);
 
                     const messageElement = document.createElement("div");
-                    messageElement.innerHTML = `<p><strong>${message.userName}</strong></p><p>${message.timestamp}</p><p>${message.content}</p>`;
+                    let html = "";
+
+                    // Only print user name and timestamp if user changed
+                    if (message.userName !== lastUserName) {
+                        html += `<p><strong>${message.userName}</strong> <span style="font-size:0.8em;color:#888;">${message.timestamp}</span></p>`;
+                    }
+                    html += `<p>${message.content}</p>`;
+                    messageElement.innerHTML = html;
                     chatBoxElement.appendChild(messageElement);
+
+                    lastUserName = message.userName;
 
                     // Trigger haptic feedback
                     if (triggerHaptics && hasVibrationSupport()) {
@@ -42,7 +56,15 @@ function printMessages(triggerHaptics = true) {
 async function sendMessage(message = "Error, user message not found") {
     let parameters = new URLSearchParams(document.location.search);
     let timestamp = new Date();
-    timestamp = `${timestamp.getHours()}:${timestamp.getMinutes()}`;
+    let minutes = timestamp.getMinutes();
+    if (minutes < 10) {
+        minutes = "0" + minutes;
+    }
+    let hours = timestamp.getHours();
+    if (hours < 10) {
+        hours = "0" + hours;
+    }
+    timestamp = `${hours}:${minutes}`;
 
     await fetch("/api/messages", {
         method: "POST",
