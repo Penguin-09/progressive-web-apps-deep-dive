@@ -2,6 +2,7 @@ console.debug("Chat script is executing");
 
 const sendButton = document.getElementById("sendMessage");
 const printedMessagesIDs = [];
+let lastUserName = null;
 
 /**
  * Print all messages in the chat log
@@ -12,34 +13,34 @@ function printMessages(triggerHaptics = true) {
         .then((messages) => {
             console.debug("Messages fetched");
 
-            // Clear chat log before printing
-            chatBoxElement.innerHTML = "";
-            printedMessagesIDs.length = 0; // Reset printed IDs
-
-            // Print message history
-            let lastUserName = null;
             for (const message of messages) {
                 if (!printedMessagesIDs.includes(message._id)) {
                     printedMessagesIDs.push(message._id);
 
                     const messageElement = document.createElement("div");
-                    let html = "";
+                    let content = "";
 
                     // Only print user name and timestamp if user changed
                     if (message.userName !== lastUserName) {
-                        html += `<p><strong>${message.userName}</strong> <span style="font-size:0.8em;color:#888;">${message.timestamp}</span></p>`;
+                        content += `<p><strong>${message.userName}</strong> <span style="font-size:0.8em;color:#888;">${message.timestamp}</span></p>`;
                     }
-                    html += `<p>${message.content}</p>`;
-                    messageElement.innerHTML = html;
+
+                    content += `<p>${message.content}</p>`;
+                    messageElement.innerHTML = content;
                     chatBoxElement.appendChild(messageElement);
 
                     lastUserName = message.userName;
+
+                    // Scroll to the bottom of the chat to show new messages
+                    chatBoxElement.scrollTop = chatBoxElement.scrollHeight;
 
                     // Trigger haptic feedback
                     if (triggerHaptics && hasVibrationSupport()) {
                         navigator.vibrate(300);
                     } else {
-                        console.debug("Vibration not supported");
+                        console.debug(
+                            "Vibration not supported, or triggerHaptics is false"
+                        );
                     }
                 }
             }
@@ -57,13 +58,17 @@ async function sendMessage(message = "Error, user message not found") {
     let parameters = new URLSearchParams(document.location.search);
     let timestamp = new Date();
     let minutes = timestamp.getMinutes();
+
     if (minutes < 10) {
         minutes = "0" + minutes;
     }
+
     let hours = timestamp.getHours();
+
     if (hours < 10) {
         hours = "0" + hours;
     }
+
     timestamp = `${hours}:${minutes}`;
 
     await fetch("/api/messages", {
@@ -77,6 +82,7 @@ async function sendMessage(message = "Error, user message not found") {
             timestamp: timestamp,
         }),
     });
+
     console.debug("Message sent");
 
     printMessages();
