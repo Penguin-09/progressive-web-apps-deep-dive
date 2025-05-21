@@ -14,28 +14,19 @@ body {
   animation: gradient-move 6s ease infinite;
   background-size: 200% 200%;
 }
-  @keyframes breathe {
-    0%, 100% {
-      transform: rotate(-12deg) scale(1);
-      opacity: 0.4;
-    }
-    50% {
-      transform: rotate(-12deg) scale(1.05);
-      opacity: 0.6;
-    }
-  }
 
-  .cassette-animated {
-    animation: breathe 4s ease-in-out infinite;
-    transform-origin: center;
-  }
+
+
+
+  
+
 
   .icons {
   display: flex;
   justify-content: center;
-  gap: 1.5rem;       /* space between icons */
+  gap: 1.5rem;
   margin-bottom: 1.5rem;
-  flex-wrap: wrap;   /* wrap on small screens */
+  flex-wrap: wrap;
 }
 
 .icons img {
@@ -48,31 +39,6 @@ body {
   cursor: default;
 }
 
-/* Different rotation for each icon */
-.icons img:nth-child(1) {
-  transform: rotate(-7deg);
-  animation-delay: 0s;
-}
-.icons img:nth-child(2) {
-  transform: rotate(5deg);
-  animation-delay: 1s;
-}
-.icons img:nth-child(3) {
-  transform: rotate(-3deg);
-  animation-delay: 2s;
-}
-
-
-@keyframes breathe {
-  0%, 100% {
-    opacity: 1;
-    scale: 1;
-  }
-  50% {
-    opacity: 0.7;
-    scale: 1.1;
-  }
-}
 
 
 .icons img:hover {

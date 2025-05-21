@@ -3,6 +3,51 @@ console.debug("Chat script is executing");
 const sendButton = document.getElementById("sendMessage");
 const printedMessagesIDs = [];
 
+const chatBoxElement = document.getElementById("chatLog");
+
+// Predefined bright colors (add more if you want)
+const brightColors = [
+    "#E53935", // Red
+    "#D81B60", // Pink
+    "#8E24AA", // Purple
+    "#3949AB", // Blue
+    "#1E88E5", // Light Blue
+    "#00ACC1", // Cyan
+    "#43A047", // Green
+    "#FDD835", // Yellow
+    "#FB8C00", // Orange
+    "#6D4C41", // Brown
+];
+
+// Load saved user colors from localStorage or create empty object
+let userColors = JSON.parse(localStorage.getItem("userColors") || "{}");
+
+/**
+ * Assign a bright color to a user or return the saved one
+ * @param {string} userName
+ * @returns {string} color in hex
+ */
+function getUserColor(userName) {
+    if (userColors[userName]) {
+        return userColors[userName];
+    }
+
+    // Find colors already used
+    const usedColors = new Set(Object.values(userColors));
+
+    // Pick first bright color not used yet
+    let availableColor = brightColors.find((color) => !usedColors.has(color));
+
+    // If all colors are used, just pick a random one from the list
+    if (!availableColor) {
+        availableColor = brightColors[Math.floor(Math.random() * brightColors.length)];
+    }
+
+    userColors[userName] = availableColor;
+    localStorage.setItem("userColors", JSON.stringify(userColors));
+    return availableColor;
+}
+
 /**
  * Print all messages in the chat log
  */
@@ -22,14 +67,17 @@ function printMessages(triggerHaptics = true) {
                 if (!printedMessagesIDs.includes(message._id)) {
                     printedMessagesIDs.push(message._id);
 
+                    const userColor = getUserColor(message.userName);
+
                     const messageElement = document.createElement("div");
                     let html = "";
 
                     // Only print user name and timestamp if user changed
                     if (message.userName !== lastUserName) {
-                        html += `<p><strong>${message.userName}</strong> <span style="font-size:0.8em;color:#888;">${message.timestamp}</span></p>`;
+                        html += `<p><strong style="color:${userColor}">${message.userName}</strong> <span style="font-size:0.8em;color:#888;">${message.timestamp}</span></p>`;
                     }
                     html += `<p>${message.content}</p>`;
+
                     messageElement.innerHTML = html;
                     chatBoxElement.appendChild(messageElement);
 
@@ -99,8 +147,6 @@ async function refreshChat() {
 function hasVibrationSupport() {
     return "vibrate" in navigator;
 }
-
-const chatBoxElement = document.getElementById("chatLog");
 
 // Clear existing messages
 chatBoxElement.innerHTML = "";
