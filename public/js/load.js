@@ -3,5 +3,5 @@
     setTimeout(() => {
       loadingScreen.classList.add("opacity-0");
       setTimeout(() => loadingScreen.remove(), 500);
-    }, 2600);
+    }, 2500);
   });
