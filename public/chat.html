@@ -1,16 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#9d5df0" />
-    <meta
-      name="description"
-      content="Yapchat is a mobile app with which users can converse with each other in one large chatroom without needing to log in or fill in their phone number."
-    />
+    <meta name="description"
+        content="Yapchat is a mobile app with which users can converse with each other in one large chatroom without needing to log in or fill in their phone number." />
     <title>Yapchat - Chat</title>
 
     <!-- PWA Meta -->
@@ -25,44 +21,36 @@
     <!-- JS -->
     <script type="module" src="js/script.js"></script>
     <script src="js/chat.js" defer></script>
-  </head>
+</head>
 
-  <body class="bg-[#c3c7cb] min-h-screen flex items-center justify-center p-4">
-    <div
-      class="w-full max-w-md border border-black bg-[#f0f0f0] shadow-[4px_4px_0_rgba(0,0,0,1)]"
-    >
-      
-      <div class="bg-[#000080] text-white px-2 py-1 flex justify-between items-center text-sm font-bold">
-        <span class="flex items-center gap-1">
-          <img src="images/floppy.png" alt="icon" class="w-4 h-4" />
-          YapChat.exe
-        </span>
-        <span class="bg-gray-300 text-black px-1 border border-gray-800">X</span>
-      </div>
+<body class="bg-[#c3c7cb] min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md border border-black bg-[#f0f0f0] shadow-[4px_4px_0_rgba(0,0,0,1)]">
 
-     
-      <div class="p-4 h-[60vh] overflow-y-auto border-t border-black bg-white text-sm font-mono space-y-1" id="chatLog">
-       
-      </div>
+        <div class="bg-[#000080] text-white px-2 py-1 flex justify-between items-center text-sm font-bold">
+            <span class="flex items-center gap-1">
+                <img src="images/floppy.png" alt="icon" class="w-4 h-4" />
+                YapChat.exe
+            </span>
+            <span class="bg-gray-300 text-black px-1 border border-gray-800">X</span>
+        </div>
 
-      
-      <form class="border-t border-black p-2 flex gap-2 items-center bg-[#e0e0e0]" onsubmit="return false;">
-        <input
-          type="text"
-          id="userMessage"
-          required
-          placeholder="Type your message..."
-          class="flex-1 px-2 py-1 border border-black bg-white text-sm focus:outline-none"
-        />
 
-        <button
-          type="submit"
-          id="sendMessage"
-          class="px-3 py-1 bg-gray-200 border border-black text-sm hover:bg-gray-300"
-        >
-          Send
-        </button>
-      </form>
+        <div class="p-4 h-[60vh] overflow-y-auto border-t border-black bg-white text-sm font-mono space-y-1"
+            id="chatLog">
+
+        </div>
+
+
+        <form class="border-t border-black p-2 flex gap-2 items-center bg-[#e0e0e0]" onsubmit="return false;">
+            <input type="text" id="userMessage" required placeholder="Type your message..."
+                class="flex-1 px-2 py-1 border border-black bg-white text-sm focus:outline-none" />
+
+            <button type="submit" id="sendMessage"
+                class="px-3 py-1 bg-gray-200 border border-black text-sm hover:bg-gray-300">
+                Send
+            </button>
+        </form>
     </div>
-  </body>
+</body>
+
 </html>
