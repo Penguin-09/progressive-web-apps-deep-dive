@@ -6,7 +6,7 @@ const printedMessagesIDs = [];
 /**
  * Print all messages in the chat log
  */
-function printMessages() {
+function printMessages(triggerHaptics = true) {
     fetch("/api/messages")
         .then((res) => res.json())
         .then((messages) => {
@@ -21,6 +21,13 @@ function printMessages() {
                     const messageElement = document.createElement("div");
                     messageElement.innerHTML = `<p><strong>${message.userName}</strong></p><p>${message.timestamp}</p><p>${message.content}</p>`;
                     chatBoxElement.appendChild(messageElement);
+
+                    // Trigger haptic feedback
+                    if (triggerHaptics && hasVibrationSupport()) {
+                        navigator.vibrate(100);
+                    } else {
+                        console.debug("Vibration not supported");
+                    }
                 }
             }
         })
@@ -59,9 +66,17 @@ async function sendMessage(message = "Error, user message not found") {
  */
 async function refreshChat() {
     while (true) {
-        printMessages();
         await new Promise((resolve) => setTimeout(resolve, 3000));
+        printMessages();
     }
+}
+
+/**
+ * Check if the device supports vibration
+ * @returns {boolean} True if the device supports vibration
+ */
+function hasVibrationSupport() {
+    return "vibrate" in navigator;
 }
 
 const chatBoxElement = document.getElementById("chatLog");
@@ -76,4 +91,5 @@ sendButton.addEventListener("click", (event) => {
     messageInput.value = "";
 });
 
+printMessages(false);
 refreshChat();
