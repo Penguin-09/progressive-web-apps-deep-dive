@@ -1,5 +1,9 @@
 console.debug("Chat script is executing");
 
+import Push from "./push.js";
+
+const push = new Push();
+
 const sendButton = document.getElementById("sendMessage");
 const printedMessagesIDs = [];
 let lastUserName = null;
@@ -55,6 +59,12 @@ function printMessages(triggerHaptics = true) {
  * @param {string} message The message to send
  */
 async function sendMessage(message = "Error, user message not found") {
+    // Send out a notification
+    push.sendPushNotification(
+        "Yapchat",
+        parameters.get("displayName") || "Anonymous" + " - " + message
+    );
+
     let parameters = new URLSearchParams(document.location.search);
     let timestamp = new Date();
     let minutes = timestamp.getMinutes();
