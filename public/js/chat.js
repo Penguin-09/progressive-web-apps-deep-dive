@@ -1,6 +1,22 @@
 console.debug("Chat script is executing");
 
-const sendButton = document.getElementById("sendMessage");
+import Push from "./push.js";
+
+let push;
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+        .register('/service-worker.js')
+        .then((registration) => {
+            push = new Push(registration);
+        })
+        .catch((error) => {
+            console.error('Service Worker registration failed:', error);
+        });
+} else {
+    console.error('Service workers are not supported in this browser.');
+}
+
+const sendButton = document.getElementById('sendMessage');
 const printedMessagesIDs = [];
 let lastUserName = null;
 let isReplying = false;
@@ -96,11 +112,17 @@ function printMessages(
  * Send a user message to the database
  * @param {string} message The message to send
  */
-async function sendMessage(
-    message = 'Error, user message not found',
-    isReplyingParam = false,
-    replyMessageIdParam = null,
-) {
+async function sendMessage(message = 'Error, user message not found') {
+    // Wait for push to be defined before using it
+    if (push) {
+        let parameters = new URLSearchParams(document.location.search);
+        const userName = parameters.get('displayName') || 'Anonymous';
+        await push.sendPushNotification(
+            userName,
+            message,
+        );
+    }
+
     let parameters = new URLSearchParams(document.location.search);
     let timestamp = new Date();
     let minutes = timestamp.getMinutes();

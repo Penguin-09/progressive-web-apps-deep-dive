@@ -1,6 +1,8 @@
 console.debug("Main Script is executing");
 
-let deferredPrompt;
+import Push from "./push.js";
+
+// let deferredPrompt;
 
 // // Listen for the beforeinstallprompt event
 // window.addEventListener("beforeinstallprompt", (event) => {
@@ -19,6 +21,9 @@ if ("serviceWorker" in navigator) {
                     "Service Worker registered with scope: ",
                     registration.scope
                 );
+
+                const push = new Push(registration);
+                push.subscribe();
             })
             .catch((error) => {
                 console.error("Service Worker registration failed: ", error);
