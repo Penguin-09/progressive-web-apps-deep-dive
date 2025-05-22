@@ -25,11 +25,8 @@ let replyMessageId = null;
 /**
  * Print all messages in the chat log
  */
-function printMessages(
-    triggerHaptics = true,
-    isReplyingParam = isReplying,
-    replyMessageIdParam = replyMessageId,
-) {
+function printMessages(triggerHaptics = true) {
+    // Remove the parameters that shadow global variables
     fetch('/api/messages')
         .then((res) => res.json())
         .then((messages) => {
@@ -38,9 +35,7 @@ function printMessages(
                 messages = messages.slice(-50);
             }
 
-            console.debug('Messages fetched', messages);
-
-            for (const message of messages) {
+             for (const message of messages) {
                 if (!printedMessagesIDs.includes(message._id)) {
                     printedMessagesIDs.push(message._id);
 
@@ -54,10 +49,16 @@ function printMessages(
                     }
 
                     // Check if the message is a reply
-                    if (message.replyMessageId) {
+                    console.log("debug 1");
+                    console.log(message.isReplying);
+
+                    if (message.isReplying) {
+                        console.log("debug 2");
+
                         const replyToMessage = messages.find(
                             (msg) => msg._id === message.replyMessageId,
                         );
+
                         if (replyToMessage) {
                             content += `<p style="color:#888;">➥ Replying to ${replyToMessage.userName}: <span style="color:#333;">${replyToMessage.content}</span></p>`;
                         }
@@ -74,13 +75,17 @@ function printMessages(
                     const msgP = messageElement.querySelector('p[id]');
                     if (msgP) {
                         msgP.addEventListener('click', (event) => {
+                            // Update the global variables directly - don't use window prefix
                             isReplying = true;
                             replyMessageId = messageId;
+                            
                             // Show reply preview
                             replyPreview.innerHTML = '';
                             replyPreview.appendChild(closeBtn);
                             replyPreview.style.display = 'block';
                             replyPreview.innerHTML += `<div><strong>Replying to ${message.userName}:</strong> <span style="color:#888;">${message.content}</span></div>`;
+                            
+                            console.log("Reply mode activated", isReplying, replyMessageId);
                         });
                     }
 
@@ -143,11 +148,9 @@ async function sendMessage(message = 'Error, user message not found') {
         content: message,
         userName: parameters.get('displayName') || 'Anonymous',
         timestamp: timestamp,
+        isReplying: isReplying,
+        replyMessageId: replyMessageId
     };
-
-    if (isReplyingParam && replyMessageIdParam) {
-        body.replyMessageId = replyMessageIdParam;
-    }
 
     await fetch('/api/messages', {
         method: 'POST',
@@ -263,9 +266,9 @@ sendButton.addEventListener('click', (event) => {
         isReplying,
         replyMessageId,
     );
-    sendMessage(messageInput.value, isReplying, replyMessageId);
+    sendMessage(messageInput.value);
     messageInput.value = '';
 });
 
-printMessages(false, isReplying, replyMessageId);
+printMessages(false);
 refreshChat();
