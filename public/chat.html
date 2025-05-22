@@ -55,36 +55,25 @@
     <div id="chatLog" class="p-4 h-[60vh] overflow-y-auto border-t border-black bg-white text-sm font-mono space-y-1">
     </div>
 
-    <form id="chatForm" class="border-t border-black p-2 flex gap-2 items-center bg-[#e0e0e0]">
-      <input type="text" id="userMessage" required placeholder="Type your message..."
-        class="flex-1 px-2 py-1 border border-black bg-white text-sm focus:outline-none" />
-      <button type="submit" id="sendMessage"
-        class="px-3 py-1 bg-gray-200 border border-black text-sm hover:bg-gray-300">
-        Send
-      </button>
-    </form>
-  </div>
+      
+      <form class="border-t border-black p-2 flex gap-2 items-center bg-[#e0e0e0]" onsubmit="return false;">
+        <div class="replyContainer width-full"></div>
+        <input
+          type="text"
+          id="userMessage"
+          required
+          placeholder="Type your message..."
+          class="flex-1 px-2 py-1 border border-black bg-white text-sm focus:outline-none"
+        />
 
-  <!-- Windows 95 Start Bar and Menu -->
-  <div
-    class="w-full border-t border-black bg-[#d4d0c8] p-1 fixed bottom-0 left-0 flex items-center justify-start shadow-inner z-50">
-    <div class="relative">
-      <button id="startButton"
-        class="bg-[#c0c0c0] border border-t-white border-l-white border-b-black border-r-black text-sm px-3 py-1 font-bold flex items-center gap-1 active:border-t-black active:border-l-black active:border-b-white active:border-r-white">
-        <img src="images/window.png" alt="Start" class="w-4 h-4" />
-        Start
-      </button>
-
-      <!-- Start Menu -->
-      <div id="startMenu"
-        class="hidden absolute bottom-[100%] left-0 mb-1 w-40 bg-[#d4d0c8] border border-black shadow-[4px_4px_0_rgba(0,0,0,1)] z-50">
-        <ul class="text-sm font-mono">
-          <li class="px-4 py-2 hover:bg-gray-300">Log out...</li>
-        </ul>
-      </div>
+        <button
+          type="submit"
+          id="sendMessage"
+          class="px-3 py-1 bg-gray-200 border border-black text-sm hover:bg-gray-300"
+        >
+          Send
+        </button>
+      </form>
     </div>
-  </div>
-
-</body>
-
+  </body>
 </html>

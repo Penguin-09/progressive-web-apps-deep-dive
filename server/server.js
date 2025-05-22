@@ -12,11 +12,15 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static("../public"));
 
-// Get messages
+// Get the latest 50 messages
 app.get("/api/messages", async (req, res) => {
     const collection = client.db("yapChat").collection("messages");
-    const messages = await collection.find({}).toArray();
-    res.json(messages);
+    const messages = await collection
+        .find()
+        .sort({ timestamp: -1 })
+        .limit(50)
+        .toArray();
+    res.json(messages.reverse());
 });
 
 app.listen(PORT, () => {
