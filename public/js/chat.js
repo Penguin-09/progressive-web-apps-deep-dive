@@ -71,19 +71,14 @@ function getUserColor(userName) {
 /**
  * Print all messages in the chat log
  */
-function printMessages(
-    triggerHaptics = true,
-    isReplyingParam = isReplying,
-    replyMessageIdParam = replyMessageId
-) {
+function printMessages(triggerHaptics = true) {
+    // Remove the unnecessary parameters
     fetch("/api/messages")
         .then((res) => res.json())
         .then((messages) => {
             if (messages.length > 50) {
                 messages = messages.slice(-50);
             }
-
-            console.debug("Messages fetched", messages);
 
             for (const message of messages) {
                 if (!printedMessagesIDs.includes(message._id)) {
@@ -110,70 +105,25 @@ function printMessages(
                         }
                     }
 
-                    for (const message of messages) {
-                        if (!printedMessagesIDs.includes(message._id)) {
-                            printedMessagesIDs.push(message._id);
-
-                            messageElement.innerHTML = content;
-                            chatBoxElement.appendChild(messageElement);
-                            const balloonSound = new Audio(
-                                "sounds/balloon.wav"
-                            );
-                            balloonSound.play();
-
-                            // Use a safe selector for the message <p> by id
-                            const msgP = messageElement.querySelector("p[id]");
-                            if (msgP) {
-                                msgP.addEventListener("click", (event) => {
-                                    isReplying = true;
-                                    replyMessageId = messageId;
-                                    // Show reply preview
-                                    replyPreview.innerHTML = "";
-                                    replyPreview.appendChild(closeBtn);
-                                    replyPreview.style.display = "block";
-                                    replyPreview.innerHTML += `<div><strong>Replying to ${message.userName}:</strong> <span style="color:#888;">${message.content}</span></div>`;
-                                });
-                            }
-
-                            // Check if the message is a reply
-                            console.log("debug 1");
-                            console.log(message.isReplying);
-
-                            if (message.isReplying) {
-                                console.log("debug 2");
-
-                                const replyToMessage = messages.find(
-                                    (msg) => msg._id === message.replyMessageId
-                                );
-
-                                if (replyToMessage) {
-                                    content += `<p style="color:#888;">➥ Replying to ${replyToMessage.userName}: <span style="color:#333;">${replyToMessage.content}</span></p>`;
-                                }
-                            }
-
-                            // Scroll to the bottom of the chat to show new messages
-                            chatBoxElement.scrollTop =
-                                chatBoxElement.scrollHeight;
-
-                            // Trigger haptic feedback
-                            if (triggerHaptics && hasVibrationSupport()) {
-                                navigator.vibrate(300);
-                            } else {
-                                console.debug(
-                                    "Vibration not supported, or triggerHaptics is false"
-                                );
-                            }
-                        }
-                    }
+                    // Add the message content
+                    content += `<p id="msg-${message._id}" class="message-content">${message.content}</p>`;
 
                     messageElement.innerHTML = content;
                     chatBoxElement.appendChild(messageElement);
 
+                    // Try to play sound
+                    try {
+                        const balloonSound = new Audio("sounds/balloon.wav");
+                        balloonSound.play();
+                    } catch (e) {
+                        console.log("Sound couldn't be played", e);
+                    }
+
                     // Use a safe selector for the message <p> by id
-                    const msgP = messageElement.querySelector("p[id]");
+                    const msgP = messageElement.querySelector(`p[id="msg-${message._id}"]`);
                     if (msgP) {
                         msgP.addEventListener("click", (event) => {
-                            // Update the global variables directly - don't use window prefix
+                            // Update the global variables
                             isReplying = true;
                             replyMessageId = messageId;
 
