@@ -75,5 +75,23 @@
         </button>
       </form>
     </div>
+      <div
+    class="w-full border-t border-black bg-[#d4d0c8] p-1 fixed bottom-0 left-0 flex items-center justify-start shadow-inner z-50">
+    <div class="relative">
+      <button id="startButton"
+        class="bg-[#c0c0c0] border border-t-white border-l-white border-b-black border-r-black text-sm px-3 py-1 font-bold flex items-center gap-1 active:border-t-black active:border-l-black active:border-b-white active:border-r-white">
+        <img src="images/window.png" alt="Start" class="w-4 h-4" />
+        Start
+      </button>
+
+      <!-- Start Menu -->
+      <div id="startMenu"
+        class="hidden absolute bottom-[100%] left-0 mb-1 w-40 bg-[#d4d0c8] border border-black shadow-[4px_4px_0_rgba(0,0,0,1)] z-50">
+        <ul class="text-sm font-mono">
+          <li class="px-4 py-2 hover:bg-gray-300">Log out...</li>
+        </ul>
+      </div>
+    </div>
+  </div>
   </body>
 </html>

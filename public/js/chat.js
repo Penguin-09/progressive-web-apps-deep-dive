@@ -221,7 +221,6 @@ function styleUsernames() {
     });
 }
 
-const chatBoxElement = document.getElementById('chatLog');
 
 // Clear existing messages
 chatBoxElement.innerHTML = '';
