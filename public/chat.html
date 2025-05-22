@@ -23,6 +23,7 @@
   <script src="js/taskbar.js" defer></script>
   <script src="js/chat.js" defer></script>
   <script src="js/animation.js" defer></script>
+  <script src="js/sound.js" defer></script>
 
 </head>
 
@@ -59,11 +60,19 @@
 
     <form class="border-t border-black p-2 flex gap-2 items-center bg-[#e0e0e0]" onsubmit="return false;">
       <div class="replyContainer width-full"></div>
-      <input type="text" id="userMessage" required placeholder="Type your message..."
-        class="flex-1 px-2 py-1 border border-black bg-white text-sm focus:outline-none" />
+      <input
+        type="text"
+        id="userMessage"
+        required
+        placeholder="Type your message..."
+        class="flex-1 px-2 py-1 border border-black bg-white text-sm focus:outline-none"
+      />
 
-      <button type="submit" id="sendMessage"
-        class="px-3 py-1 bg-gray-200 border border-black text-sm hover:bg-gray-300">
+      <button
+        type="submit"
+        id="sendMessage"
+        class="px-3 py-1 bg-gray-200 border border-black text-sm hover:bg-gray-300"
+      >
         Send
       </button>
     </form>
@@ -90,5 +99,4 @@
   </div>
 
 </body>
-
 </html>
