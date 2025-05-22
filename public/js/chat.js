@@ -8,18 +8,18 @@ let replyMessageId = null;
 
 const chatBoxElement = document.getElementById("chatLog");
 
-// Predefined bright colors (add more if you want)
+// Predefined bright colors
 const brightColors = [
-    "#E53935", // Red
-    "#D81B60", // Pink
-    "#8E24AA", // Purple
-    "#3949AB", // Blue
-    "#1E88E5", // Light Blue
-    "#00ACC1", // Cyan
-    "#43A047", // Green
-    "#FDD835", // Yellow
-    "#FB8C00", // Orange
-    "#6D4C41", // Brown
+  "#E53935", // Red
+  "#D81B60", // Pink
+  "#8E24AA", // Purple
+  "#3949AB", // Blue
+  "#1E88E5", // Light Blue
+  "#00ACC1", // Cyan
+  "#43A047", // Green
+  "#FDD835", // Yellow
+  "#FB8C00", // Orange
+  "#6D4C41", // Brown
 ];
 
 // Load saved user colors from localStorage or create empty object
@@ -31,112 +31,114 @@ let userColors = JSON.parse(localStorage.getItem("userColors") || "{}");
  * @returns {string} color in hex
  */
 function getUserColor(userName) {
-    if (userColors[userName]) {
-        return userColors[userName];
-    }
+  if (userColors[userName]) {
+    return userColors[userName];
+  }
 
-    // Find colors already used
-    const usedColors = new Set(Object.values(userColors));
+  // Find colors already used
+  const usedColors = new Set(Object.values(userColors));
 
-    // Pick first bright color not used yet
-    let availableColor = brightColors.find((color) => !usedColors.has(color));
+  // Pick first bright color not used yet
+  let availableColor = brightColors.find((color) => !usedColors.has(color));
 
-    // If all colors are used, just pick a random one from the list
-    if (!availableColor) {
-        availableColor = brightColors[Math.floor(Math.random() * brightColors.length)];
-    }
+  // If all colors are used, just pick a random one from the list
+  if (!availableColor) {
+    availableColor =
+      brightColors[Math.floor(Math.random() * brightColors.length)];
+  }
 
-    userColors[userName] = availableColor;
-    localStorage.setItem("userColors", JSON.stringify(userColors));
-    return availableColor;
+  userColors[userName] = availableColor;
+  localStorage.setItem("userColors", JSON.stringify(userColors));
+  return availableColor;
 }
 
 /**
  * Print all messages in the chat log
  */
 function printMessages(
-    triggerHaptics = true,
-    isReplyingParam = isReplying,
-    replyMessageIdParam = replyMessageId,
+  triggerHaptics = true,
+  isReplyingParam = isReplying,
+  replyMessageIdParam = replyMessageId
 ) {
-    fetch('/api/messages')
-        .then((res) => res.json())
-        .then((messages) => {
+  fetch("/api/messages")
+    .then((res) => res.json())
+    .then((messages) => {
+      if (messages.length > 50) {
+        messages = messages.slice(-50);
+      }
 
-            if (messages.length > 50) {
-                messages = messages.slice(-50);
+      console.debug("Messages fetched", messages);
+
+      for (const message of messages) {
+        if (!printedMessagesIDs.includes(message._id)) {
+          printedMessagesIDs.push(message._id);
+
+          const userColor = getUserColor(message.userName);
+
+          const messageElement = document.createElement("div");
+          let messageId = message._id;
+          let content = "";
+
+          // Only print user name and timestamp if user changed
+          if (message.userName !== lastUserName) {
+            content += `<p class="userName"><strong style="color:${userColor}">${message.userName}</strong> <span style="font-size:0.8em;color:#888;">${message.timestamp}</span></p>`;
+          }
+
+          // Check if the message is a reply
+          if (message.replyMessageId) {
+            const replyToMessage = messages.find(
+              (msg) => msg._id === message.replyMessageId
+            );
+            if (replyToMessage) {
+              content += `<p style="color:#888;">➥ Replying to ${replyToMessage.userName}: <span style="color:#333;">${replyToMessage.content}</span></p>`;
             }
+          }
 
-            console.debug('Messages fetched', messages);
+          message.replyMessageId = null;
 
-            for (const message of messages) {
-                if (!printedMessagesIDs.includes(message._id)) {
-                    printedMessagesIDs.push(message._id);
+          content += `<p id="${messageId}">${message.content}</p>`;
 
-                    const userColor = getUserColor(message.userName);
+          messageElement.innerHTML = content;
+          chatBoxElement.appendChild(messageElement);
+          const balloonSound = new Audio("sounds/balloon.wav");
+          balloonSound.play();
 
-                    const messageElement = document.createElement('div');
-                    let messageId = message._id;
-                    let content = '';
+          // Use a safe selector for the message <p> by id
+          const msgP = messageElement.querySelector("p[id]");
+          if (msgP) {
+            msgP.addEventListener("click", (event) => {
+              isReplying = true;
+              replyMessageId = messageId;
+              // Show reply preview
+              replyPreview.innerHTML = "";
+              replyPreview.appendChild(closeBtn);
+              replyPreview.style.display = "block";
+              replyPreview.innerHTML += `<div><strong>Replying to ${message.userName}:</strong> <span style="color:#888;">${message.content}</span></div>`;
+            });
+          }
 
-                    // Only print user name and timestamp if user changed
-                    if (message.userName !== lastUserName) {
-                        content += `<p class="userName"><strong style="color:${userColor}">${message.userName}</strong> <span style="font-size:0.8em;color:#888;">${message.timestamp}</span></p>`;
-                    }
+          lastUserName = message.userName;
 
-                    // Check if the message is a reply
-                    if (message.replyMessageId) {
-                        const replyToMessage = messages.find(
-                            (msg) => msg._id === message.replyMessageId,
-                        );
-                        if (replyToMessage) {
-                            content += `<p style="color:#888;">➥ Replying to ${replyToMessage.userName}: <span style="color:#333;">${replyToMessage.content}</span></p>`;
-                        }
-                    }
+          // Scroll to the bottom of the chat to show new messages
+          chatBoxElement.scrollTop = chatBoxElement.scrollHeight;
 
-                    message.replyMessageId = null;
+          // Trigger haptic feedback
+          if (triggerHaptics && hasVibrationSupport()) {
+            navigator.vibrate(300);
+          } else {
+            console.debug(
+              "Vibration not supported, or triggerHaptics is false"
+            );
+          }
+        }
+      }
 
-                    content += `<p id="${messageId}">${message.content}</p>`;
-
-                    messageElement.innerHTML = content;
-                    chatBoxElement.appendChild(messageElement);
-
-                    // Use a safe selector for the message <p> by id
-                    const msgP = messageElement.querySelector('p[id]');
-                    if (msgP) {
-                        msgP.addEventListener('click', (event) => {
-                            isReplying = true;
-                            replyMessageId = messageId;
-                            // Show reply preview
-                            replyPreview.innerHTML = '';
-                            replyPreview.appendChild(closeBtn);
-                            replyPreview.style.display = 'block';
-                            replyPreview.innerHTML += `<div><strong>Replying to ${message.userName}:</strong> <span style="color:#888;">${message.content}</span></div>`;
-                        });
-                    }
-
-                    lastUserName = message.userName;
-
-                    // Scroll to the bottom of the chat to show new messages
-                    chatBoxElement.scrollTop = chatBoxElement.scrollHeight;
-
-                    // Trigger haptic feedback
-                    if (triggerHaptics && hasVibrationSupport()) {
-                        navigator.vibrate(300);
-                    } else {
-                        console.debug(
-                            'Vibration not supported, or triggerHaptics is false',
-                        );
-                    }
-                }
-            }
-
-            // Call after messages are rendered
-            styleUsernames();
-        })
-        .catch((error) => {
-            console.error('Error fetching messages:', error);
-        });
+      // Call after messages are rendered
+      styleUsernames();
+    })
+    .catch((error) => {
+      console.error("Error fetching messages:", error);
+    });
 }
 
 /**
@@ -144,64 +146,64 @@ function printMessages(
  * @param {string} message The message to send
  */
 async function sendMessage(
-    message = 'Error, user message not found',
-    isReplyingParam = false,
-    replyMessageIdParam = null,
+  message = "Error, user message not found",
+  isReplyingParam = false,
+  replyMessageIdParam = null
 ) {
-    let parameters = new URLSearchParams(document.location.search);
-    let timestamp = new Date();
-    let minutes = timestamp.getMinutes();
+  let parameters = new URLSearchParams(document.location.search);
+  let timestamp = new Date();
+  let minutes = timestamp.getMinutes();
 
-    if (minutes < 10) {
-        minutes = '0' + minutes;
-    }
+  if (minutes < 10) {
+    minutes = "0" + minutes;
+  }
 
-    let hours = timestamp.getHours();
+  let hours = timestamp.getHours();
 
-    if (hours < 10) {
-        hours = '0' + hours;
-    }
+  if (hours < 10) {
+    hours = "0" + hours;
+  }
 
-    timestamp = `${hours}:${minutes}`;
+  timestamp = `${hours}:${minutes}`;
 
-    const body = {
-        content: message,
-        userName: parameters.get('displayName') || 'Anonymous',
-        timestamp: timestamp,
-    };
+  const body = {
+    content: message,
+    userName: parameters.get("displayName") || "Anonymous",
+    timestamp: timestamp,
+  };
 
-    if (isReplyingParam && replyMessageIdParam) {
-        body.replyMessageId = replyMessageIdParam;
-    }
+  if (isReplyingParam && replyMessageIdParam) {
+    body.replyMessageId = replyMessageIdParam;
+  }
 
-    await fetch('/api/messages', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-    });
+  await fetch("/api/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
 
-    console.debug('Message sent');
+  console.debug("Message sent");
 
-    // Reset reply state after sending
-    isReplying = false;
-    replyMessageId = null;
-    replyPreview.style.display = 'none';
-    replyPreview.innerHTML = '';
-    replyPreview.appendChild(closeBtn);
+  // Reset reply state after sending
+  isReplying = false;
+  replyMessageId = null;
+  replyPreview.style.display = "none";
+  replyPreview.innerHTML = "";
+  replyPreview.appendChild(closeBtn);
 
-    printMessages();
+  printMessages();
 }
 
 /**
  * Reload messages every 3 seconds
  */
 async function refreshChat() {
-    while (true) {
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-        printMessages();
-    }
+  while (true) {
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    printMessages();
+  }
 }
 
 /**
@@ -209,86 +211,93 @@ async function refreshChat() {
  * @returns {boolean} True if the device supports vibration
  */
 function hasVibrationSupport() {
-    return 'vibrate' in navigator;
+  return "vibrate" in navigator;
 }
 
 /**
  * Add margin-top to all username elements for whitespace above
  */
 function styleUsernames() {
-    document.querySelectorAll('.userName').forEach((el) => {
-        el.style.marginTop = '1rem';
-    });
+  document.querySelectorAll(".userName").forEach((el) => {
+    el.style.marginTop = "1rem";
+  });
 }
 
-
 // Clear existing messages
-chatBoxElement.innerHTML = '';
+chatBoxElement.innerHTML = "";
 
 // Reply preview UI
-const replyPreview = document.createElement('div');
-replyPreview.id = 'replyPreview';
-replyPreview.style.display = 'none';
-replyPreview.style.background = '#f0f0f0';
-replyPreview.style.padding = '6px 10px';
-replyPreview.style.marginBottom = '6px';
-replyPreview.style.borderLeft = '4px solid #888';
-replyPreview.style.fontSize = '0.9em';
-replyPreview.style.color = '#333';
-replyPreview.style.position = 'relative';
-replyPreview.style.width = '100%';
-replyPreview.style.boxSizing = 'border-box';
+const replyPreview = document.createElement("div");
+replyPreview.id = "replyPreview";
+replyPreview.style.display = "none";
+replyPreview.style.background = "#f0f0f0";
+replyPreview.style.padding = "6px 10px";
+replyPreview.style.marginBottom = "6px";
+replyPreview.style.borderLeft = "4px solid #888";
+replyPreview.style.fontSize = "0.9em";
+replyPreview.style.color = "#333";
+replyPreview.style.position = "relative";
+replyPreview.style.width = "100%";
+replyPreview.style.boxSizing = "border-box";
 
 // Close button
-const closeBtn = document.createElement('span');
-closeBtn.textContent = '×';
-closeBtn.id = 'replyCloseBtn';
-closeBtn.style.position = 'absolute';
-closeBtn.style.right = '8px';
-closeBtn.style.top = '2px';
-closeBtn.style.cursor = 'pointer';
-closeBtn.style.fontWeight = 'bold';
-document.addEventListener('click', function (event) {
-    if (event.target && event.target.id === 'replyCloseBtn') {
-        console.log('Close button clicked');
-        isReplying = false;
-        replyMessageId = null;
-        replyPreview.style.display = 'none';
-        replyPreview.innerHTML = '';
-        replyPreview.appendChild(closeBtn);
-    }
+const closeBtn = document.createElement("span");
+closeBtn.textContent = "×";
+closeBtn.id = "replyCloseBtn";
+closeBtn.style.position = "absolute";
+closeBtn.style.right = "8px";
+closeBtn.style.top = "2px";
+closeBtn.style.cursor = "pointer";
+closeBtn.style.fontWeight = "bold";
+document.addEventListener("click", function (event) {
+  if (event.target && event.target.id === "replyCloseBtn") {
+    console.log("Close button clicked");
+    isReplying = false;
+    replyMessageId = null;
+    replyPreview.style.display = "none";
+    replyPreview.innerHTML = "";
+    replyPreview.appendChild(closeBtn);
+  }
 });
 replyPreview.appendChild(closeBtn);
 
 // Insert replyPreview into the replyContainer div
-const replyContainer = document.querySelector('.replyContainer');
+const replyContainer = document.querySelector(".replyContainer");
 if (replyContainer) {
-    replyContainer.appendChild(replyPreview);
-    replyContainer.style.width = '100%';
-    replyContainer.style.display = 'block';
-    replyContainer.style.marginBottom = '0';
+  replyContainer.appendChild(replyPreview);
+  replyContainer.style.width = "100%";
+  replyContainer.style.display = "block";
+  replyContainer.style.marginBottom = "0";
 }
 
 // Make sure the form uses flex-col
-const chatForm = document.querySelector('form');
+const chatForm = document.querySelector("form");
 if (chatForm) {
-    chatForm.style.display = 'flex';
-    chatForm.style.flexDirection = 'column';
-    chatForm.style.gap = '0.5rem';
-    chatForm.style.alignItems = 'stretch';
+  chatForm.style.display = "flex";
+  chatForm.style.flexDirection = "column";
+  chatForm.style.gap = "0.5rem";
+  chatForm.style.alignItems = "stretch";
 }
 
-sendButton.addEventListener('click', (event) => {
-    event.preventDefault();
-    const messageInput = document.getElementById('userMessage');
-    console.log(
-        'Send button clicked',
-        messageInput.value,
-        isReplying,
-        replyMessageId,
-    );
-    sendMessage(messageInput.value, isReplying, replyMessageId);
-    messageInput.value = '';
+sendButton.addEventListener("click", (event) => {
+  event.preventDefault();
+  const messageInput = document.getElementById("userMessage");
+  const messageText = messageInput.value.trim();
+
+  if (messageText === "") {
+    console.log("Empty message not sent");
+    return; // Don't send the message if it's empty
+  }
+
+  if (messageText.length > 20) {
+    console.log("Message too long");
+    alert("Message can’t be longer than 20 characters.");
+    return;
+  }
+
+  console.log("Send button clicked", messageText, isReplying, replyMessageId);
+  sendMessage(messageText, isReplying, replyMessageId);
+  messageInput.value = "";
 });
 
 printMessages(false, isReplying, replyMessageId);
