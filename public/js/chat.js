@@ -2,9 +2,21 @@ console.debug("Chat script is executing");
 
 import Push from "./push.js";
 
-const push = new Push();
+let push;
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+        .register('/service-worker.js')
+        .then((registration) => {
+            push = new Push(registration);
+        })
+        .catch((error) => {
+            console.error('Service Worker registration failed:', error);
+        });
+} else {
+    console.error('Service workers are not supported in this browser.');
+}
 
-const sendButton = document.getElementById("sendMessage");
+const sendButton = document.getElementById('sendMessage');
 const printedMessagesIDs = [];
 let lastUserName = null;
 
@@ -12,17 +24,17 @@ let lastUserName = null;
  * Print all messages in the chat log
  */
 function printMessages(triggerHaptics = true) {
-    fetch("/api/messages")
+    fetch('/api/messages')
         .then((res) => res.json())
         .then((messages) => {
-            console.debug("Messages fetched");
+            console.debug('Messages fetched');
 
             for (const message of messages) {
                 if (!printedMessagesIDs.includes(message._id)) {
                     printedMessagesIDs.push(message._id);
 
-                    const messageElement = document.createElement("div");
-                    let content = "";
+                    const messageElement = document.createElement('div');
+                    let content = '';
 
                     // Only print user name and timestamp if user changed
                     if (message.userName !== lastUserName) {
@@ -43,14 +55,14 @@ function printMessages(triggerHaptics = true) {
                         navigator.vibrate(300);
                     } else {
                         console.debug(
-                            "Vibration not supported, or triggerHaptics is false"
+                            'Vibration not supported, or triggerHaptics is false',
                         );
                     }
                 }
             }
         })
         .catch((error) => {
-            console.error("Error fetching messages:", error);
+            console.error('Error fetching messages:', error);
         });
 }
 
@@ -58,42 +70,46 @@ function printMessages(triggerHaptics = true) {
  * Send a user message to the database
  * @param {string} message The message to send
  */
-async function sendMessage(message = "Error, user message not found") {
-    // Send out a notification
-    push.sendPushNotification(
-        "Yapchat",
-        parameters.get("displayName") || "Anonymous" + " - " + message
-    );
+async function sendMessage(message = 'Error, user message not found') {
+    // Wait for push to be defined before using it
+    if (push) {
+        let parameters = new URLSearchParams(document.location.search);
+        const userName = parameters.get('displayName') || 'Anonymous';
+        await push.sendPushNotification(
+            userName,
+            message,
+        );
+    }
 
     let parameters = new URLSearchParams(document.location.search);
     let timestamp = new Date();
     let minutes = timestamp.getMinutes();
 
     if (minutes < 10) {
-        minutes = "0" + minutes;
+        minutes = '0' + minutes;
     }
 
     let hours = timestamp.getHours();
 
     if (hours < 10) {
-        hours = "0" + hours;
+        hours = '0' + hours;
     }
 
     timestamp = `${hours}:${minutes}`;
 
-    await fetch("/api/messages", {
-        method: "POST",
+    await fetch('/api/messages', {
+        method: 'POST',
         headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         },
         body: JSON.stringify({
             content: message,
-            userName: parameters.get("displayName") || "Anonymous",
+            userName: parameters.get('displayName') || 'Anonymous',
             timestamp: timestamp,
         }),
     });
 
-    console.debug("Message sent");
+    console.debug('Message sent');
 
     printMessages();
 }

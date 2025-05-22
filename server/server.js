@@ -75,25 +75,44 @@ app.get("/api/send-push-notification", async (request, response) => {
 
         const subscriptions = await subscriptionsCollection.find().toArray();
 
+        const notificationTitle = request.query.title;
+        const notificationBody = request.query.body;
+        // Set the icon to the favicon
         const notificationPayload = JSON.stringify({
-            title: "Test notification",
-            body: "Test notification content",
+            title: notificationTitle,
+            body: notificationBody,
         });
 
+        let sent = 0;
+        let failed = 0;
+
         for (const subscription of subscriptions) {
-            webpush
-                .sendNotification(subscription, notificationPayload)
-                .then((sendResult) => {
+            try {
+                await webpush.sendNotification(
+                    subscription,
+                    notificationPayload,
+                );
+                sent++;
+            } catch (error) {
+                failed++;
+                // Remove invalid subscriptions
+                if (
+                    error.statusCode === 410 || // Gone
+                    error.statusCode === 404 // Not Found
+                ) {
+                    await subscriptionsCollection.deleteOne({
+                        endpoint: subscription.endpoint,
+                    });
                     console.log(
-                        `Notification sent to ${subscription.endpoint}: ${sendResult.statusCode}`
+                        `Removed invalid subscription: ${subscription.endpoint}`,
                     );
-                })
-                .catch((error) => {
-                    console.error(
-                        `Failed to send notification to ${subscription.endpoint}: ${error}`
-                    );
-                });
+                }
+                console.error(
+                    `Failed to send notification to ${subscription.endpoint}: ${error}`,
+                );
+            }
         }
+        response.json({ sent, failed });
     } catch (error) {
         console.error(error);
         response

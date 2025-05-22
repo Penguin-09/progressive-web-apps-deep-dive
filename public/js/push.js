@@ -125,7 +125,8 @@ export default class Push {
      * Send the push notification
      */
     async sendPushNotification(notificationTitle, notificationBody) {
-        const result = await fetch("/api/send-push-notification");
+        const url = `/api/send-push-notification?title=${encodeURIComponent(notificationTitle)}&body=${encodeURIComponent(notificationBody)}`;
+        const result = await fetch(url);
         const { sent, failed } = await result.json();
         console.log(`Push notification sent: ${sent}, failed: ${failed}`);
     }
