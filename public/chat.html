@@ -1,69 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    />
-    <meta name="theme-color" content="#9d5df0" />
-    <meta
-      name="description"
-      content="Yapchat is a mobile app with which users can converse with each other in one large chatroom without needing to log in or fill in their phone number."
-    />
-    <title>Yapchat - Chat</title>
-
-    <!-- PWA Meta -->
-    <link rel="manifest" href="manifest.json" />
-    <link rel="icon" type="image/x-icon" href="favicon.ico" />
-    <link rel="apple-touch-icon" href="circle.svg" />
-
-    <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css" />
-    <link href="src/output.css" rel="stylesheet" />
-
-    <!-- JS -->
-    <script type="module" src="js/script.js"></script>
-    <script type="module" src="js/chat.js"></script>
-  </head>
-
-  <body class="bg-[#c3c7cb] min-h-screen flex items-center justify-center p-4">
-    <div
-      class="w-full max-w-md border border-black bg-[#f0f0f0] shadow-[4px_4px_0_rgba(0,0,0,1)]"
-    >
-      
-      <div class="bg-[#000080] text-white px-2 py-1 flex justify-between items-center text-sm font-bold">
-        <span class="flex items-center gap-1">
-          <img src="images/floppy.png" alt="icon" class="w-4 h-4" />
-          YapChat.exe
-        </span>
-        <span class="bg-gray-300 text-black px-1 border border-gray-800">X</span>
-      </div>
-
-     
-      <div class="p-4 h-[60vh] overflow-y-auto border-t border-black bg-white text-sm font-mono space-y-1" id="chatLog">
-       
-      </div>
-
-      
-      <form class="border-t border-black p-2 flex gap-2 items-center bg-[#e0e0e0]" onsubmit="return false;">
-        <div class="replyContainer width-full"></div>
-        <input
-          type="text"
-          id="userMessage"
-          required
-          placeholder="Type your message..."
-          class="flex-1 px-2 py-1 border border-black bg-white text-sm focus:outline-none"
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, viewport-fit=cover"
         />
+        <meta name="theme-color" content="#9d5df0" />
+        <meta
+            name="description"
+            content="Yapchat is a mobile app with which users can converse with each other in one large chatroom without needing to log in or fill in their phone number."
+        />
+        <title>Yapchat - Chat</title>
 
-        <button
-          type="submit"
-          id="sendMessage"
-          class="px-3 py-1 bg-gray-200 border border-black text-sm hover:bg-gray-300"
+        <!-- PWA Meta -->
+        <link rel="manifest" href="manifest.json" />
+        <link rel="icon" type="image/x-icon" href="favicon.ico" />
+        <link rel="apple-touch-icon" href="circle.svg" />
+
+        <!-- CSS -->
+        <link rel="stylesheet" href="css/style.css" />
+        <link href="src/output.css" rel="stylesheet" />
+
+        <!-- JS -->
+        <script type="module" src="js/script.js"></script>
+        <script type="module" src="js/chat.js"></script>
+        <script src="js/taskbar.js" defer></script>
+        <script src="js/animation.js" defer></script>
+        <script src="js/sound.js" defer></script>
+    </head>
+
+    <body
+        class="bg-[#c3c7cb] min-h-screen flex items-center justify-center px-4 pt-4 pb-20 relative"
+    >
+        <!-- Sidebar Icons Left -->
+        <div
+            class="fixed top-0 left-0 flex flex-row items-center space-x-6 p-4 bg-transparent z-50 text-cyan-50"
         >
-          Send
-        </button>
-      </form>
-    </div>
-  </body>
+            <div class="flex flex-col items-center space-y-1">
+                <img src="images/cassette.png" alt="cassette" class="w-8 h-8" />
+                <span class="text-xs font-mono text-center">Cassette.exe</span>
+            </div>
+            <div class="flex flex-col items-center space-y-1">
+                <img src="images/floppy.png" alt="floppy" class="w-8 h-8" />
+                <span class="text-xs font-mono text-center">Floppy.exe</span>
+            </div>
+            <div class="flex flex-col items-center space-y-1">
+                <img src="images/phone-icon.png" alt="phone" class="w-8 h-8" />
+                <span class="text-xs font-mono text-center">Phone.exe</span>
+            </div>
+        </div>
+
+        <!-- Chat Window -->
+        <div
+            class="w-full max-w-md border border-black bg-[#f0f0f0] shadow-[4px_4px_0_rgba(0,0,0,1)]"
+        >
+            <div
+                class="bg-[#000080] text-white px-2 py-1 flex justify-between items-center text-sm font-bold"
+            >
+                <span class="flex items-center gap-1">
+                    <img src="images/floppy.png" alt="icon" class="w-4 h-4" />
+                    YapChat.exe
+                </span>
+                <span class="bg-gray-300 text-black px-1 border border-gray-800"
+                    >X</span
+                >
+            </div>
+
+            <div
+                id="chatLog"
+                class="p-4 h-[60vh] overflow-y-auto border-t border-black bg-white text-sm font-mono space-y-1"
+            ></div>
+
+            <form
+                class="border-t border-black p-2 flex gap-2 items-center bg-[#e0e0e0]"
+                onsubmit="return false;"
+            >
+                <div class="replyContainer width-full"></div>
+                <input
+                    type="text"
+                    id="userMessage"
+                    required
+                    placeholder="Type your message..."
+                    class="flex-1 px-2 py-1 border border-black bg-white text-sm focus:outline-none"
+                />
+
+                <button
+                    type="submit"
+                    id="sendMessage"
+                    class="px-3 py-1 bg-gray-200 border border-black text-sm hover:bg-gray-300"
+                >
+                    Send
+                </button>
+            </form>
+        </div>
+
+        <!-- Windows 95 Start Bar and Menu -->
+        <div
+            class="w-full border-t border-black bg-[#d4d0c8] p-1 fixed bottom-0 left-0 flex items-center justify-start shadow-inner z-50"
+        >
+            <div class="relative">
+                <button
+                    id="startButton"
+                    class="bg-[#c0c0c0] border border-t-white border-l-white border-b-black border-r-black text-sm px-3 py-1 font-bold flex items-center gap-1 active:border-t-black active:border-l-black active:border-b-white active:border-r-white"
+                >
+                    <img src="images/window.png" alt="Start" class="w-4 h-4" />
+                    Start
+                </button>
+
+                <!-- Start Menu -->
+                <div
+                    id="startMenu"
+                    class="hidden absolute bottom-[100%] left-0 mb-1 w-40 bg-[#d4d0c8] border border-black shadow-[4px_4px_0_rgba(0,0,0,1)] z-50"
+                >
+                    <ul class="text-sm font-mono">
+                        <li class="px-4 py-2 hover:bg-gray-300">Log out...</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </body>
 </html>
