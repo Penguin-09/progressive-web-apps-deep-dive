@@ -170,6 +170,16 @@ function printMessages(triggerHaptics = true) {
  * @param {string} message The message to send
  */
 async function sendMessage(message = "Error, user message not found") {
+
+    if (message.length < 1) {
+        console.error("Message is empty");
+        return;
+    }
+
+    if (message.length > 300) {
+        console.error("Message is too long");
+        return;
+    }
     // Wait for push to be defined before using it
     if (push) {
         let parameters = new URLSearchParams(document.location.search);
